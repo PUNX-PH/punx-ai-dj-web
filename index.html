@@ -1,124 +1,127 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Agent Space</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(135deg, #4285F4, #EA4335, #FBBC05, #34A853);
-      background-size: 600% 600%;
-      animation: gradientShift 15s ease infinite;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      color: white;
-      text-align: center;
-    }
-
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    h1 {
-      font-size: 3rem;
-      margin: 0 0 10px 0;
-    }
-
-    p {
-      font-size: 1.2rem;
-      max-width: 600px;
-      margin-bottom: 40px;
-      color: #f0f0f0;
-    }
-
-    #heygen-streaming-embed {
-      width: 320px;
-      height: 320px;
-      border-radius: 50%;
-      border: 4px solid #fff;
-      box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.3);
-      overflow: hidden;
-      transition: all 0.2s ease-in-out;
-      opacity: 0;
-      visibility: hidden;
-    }
-
-    #heygen-streaming-embed.show {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    #heygen-streaming-embed.expand {
-      width: 640px;
-      height: 360px;
-      border-radius: 16px;
-      border: none;
-    }
-
-    #heygen-streaming-container {
-      width: 100%;
-      height: 100%;
-    }
-
-    #heygen-streaming-container iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
-  </style>
-</head>
-<body>
-  <h1>Agent Space</h1>
-  <p>Welcome to Agent Space — your personal business coach.</p>
-
-  <!-- Heygen Embed Script -->
-  <div id="heygen-streaming-embed">
-    <div id="heygen-streaming-container">
-      <iframe
-        allowfullscreen="false"
-        title="Streaming Embed"
-        role="dialog"
-        allow="microphone"
-        src="https://labs.heygen.com/guest/streaming-embed?share=eyJxdWFsaXR5IjoiaGlnaCIsImF2YXRhck5hbWUiOiJHcmFoYW1fQmxhY2tfU3VpdF9wdWJsaWMiLCJwcmV2aWV3SW1nIjoiaHR0cHM6Ly9maWxlczIuaGV5Z2VuLmFpL2F2YXRhci92My9lMDRlYmFiY2M2Nzg0Y2I2OTU5YTg2NjYwNTQ3NDY1MF81NTM1MC9wcmV2aWV3X3RhbGtfMS53ZWJwIiwibmVlZFJlbW92ZUJhY2tncm91bmQiOnRydWUsImtub3dsZWRnZUJhc2VJZCI6IjNhNjlkMDdjYWU0MTQ1MDJhZGI5NjQwOWRmZjkyYjliIiwidXNlcm5hbWUiOiI5NTAwYTdhOGZmODk0MGQ1OGJjMzRkMTUyZjEwMmEyMCJ9&inIFrame=1">
-      </iframe>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity Web Player | AI Dj</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+  </head>
+  <body>
+    <div id="unity-container" class="unity-desktop">
+      <canvas id="unity-canvas" width=450 height=800 tabindex="-1"></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
+        </div>
+      </div>
+      <div id="unity-warning"> </div>
+      <div id="unity-footer">
+        <div id="unity-logo-title-footer"></div>
+        <div id="unity-fullscreen-button"></div>
+        <div id="unity-build-title">AI Dj</div>
+      </div>
     </div>
-  </div>
+    <script>
+      var canvas = document.querySelector("#unity-canvas");
 
-  <script>
-    !function(window){
-      const host = "https://labs.heygen.com";
-      const wrapDiv = document.getElementById("heygen-streaming-embed");
-      const clientWidth = document.body.clientWidth;
-
-      let visible = false, initial = false;
-
-      window.addEventListener("message", (e) => {
-        if (e.origin === host && e.data?.type === "streaming-embed") {
-          if (e.data.action === "init") {
-            initial = true;
-            wrapDiv.classList.add("show");
-          } else if (e.data.action === "show") {
-            visible = true;
-            wrapDiv.classList.add("expand");
-          } else if (e.data.action === "hide") {
-            visible = false;
-            wrapDiv.classList.remove("expand");
-          }
+      // Shows a temporary message banner/ribbon for a few seconds, or
+      // a permanent error message on top of the canvas if type=='error'.
+      // If type=='warning', a yellow highlight color is used.
+      // Modify or remove this function to customize the visually presented
+      // way that non-critical warnings and error messages are presented to the
+      // user.
+      function unityShowBanner(msg, type) {
+        var warningBanner = document.querySelector("#unity-warning");
+        function updateBannerVisibility() {
+          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
         }
-      });
-    }(globalThis);
-  </script>
-</body>
+        var div = document.createElement('div');
+        div.innerHTML = msg;
+        warningBanner.appendChild(div);
+        if (type == 'error') div.style = 'background: red; padding: 10px;';
+        else {
+          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+          setTimeout(function() {
+            warningBanner.removeChild(div);
+            updateBannerVisibility();
+          }, 5000);
+        }
+        updateBannerVisibility();
+      }
+
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/punx-ai-dj-web.loader.js";
+      var config = {
+        arguments: [],
+        dataUrl: buildUrl + "/punx-ai-dj-web.data.gz",
+        frameworkUrl: buildUrl + "/punx-ai-dj-web.framework.js.gz",
+        codeUrl: buildUrl + "/punx-ai-dj-web.wasm.gz",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "Punx",
+        productName: "AI Dj",
+        productVersion: "0.1",
+        showBanner: unityShowBanner,
+      };
+
+      // By default, Unity keeps WebGL canvas render target size matched with
+      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
+      // Set this to false if you want to decouple this synchronization from
+      // happening inside the engine, and you would instead like to size up
+      // the canvas DOM size and WebGL render target sizes yourself.
+      // config.matchWebGLToCanvasSize = false;
+
+      // If you would like all file writes inside Unity Application.persistentDataPath
+      // directory to automatically persist so that the contents are remembered when
+      // the user revisits the site the next time, uncomment the following line:
+      // config.autoSyncPersistentDataPath = true;
+      // This autosyncing is currently not the default behavior to avoid regressing
+      // existing user projects that might rely on the earlier manual
+      // JS_FileSystem_Sync() behavior, but in future Unity version, this will be
+      // expected to change.
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        // Mobile device style: fill the whole browser client area with the game canvas:
+
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+        document.querySelector("#unity-container").className = "unity-mobile";
+        canvas.className = "unity-mobile";
+
+        // To lower canvas resolution on mobile devices to gain some
+        // performance, uncomment the following line:
+        // config.devicePixelRatio = 1;
+
+
+      } else {
+        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
+        canvas.style.width = "450px";
+        canvas.style.height = "800px";
+      }
+
+      document.querySelector("#unity-loading-bar").style.display = "block";
+
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+          document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
+              }).then((unityInstance) => {
+                document.querySelector("#unity-loading-bar").style.display = "none";
+                document.querySelector("#unity-fullscreen-button").onclick = () => {
+                  unityInstance.SetFullscreen(1);
+                };
+
+              }).catch((message) => {
+                alert(message);
+              });
+            };
+
+      document.body.appendChild(script);
+
+    </script>
+  </body>
 </html>
