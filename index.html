@@ -6,29 +6,46 @@
     <title>Unity Web Player | AI Dj</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
+    <style>
+      /* Ensure iframe overlays properly */
+      #suno-iframe-wrapper {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        width: 760px;
+        height: 240px;
+        pointer-events: auto;
+      }
+    </style>
   </head>
   <body>
     <!-- Unity WebGL Container -->
     <div id="unity-container" class="unity-desktop">
-      
-      <!-- Suno Player Embedded Inside Unity Container -->
-      <div style="display: flex; justify-content: center; margin: 20px 0;">
-        <iframe src="https://suno.com/embed/78c643f8-c166-4f84-ab07-f6d22514f4c3" width="760" height="240" frameborder="0" allowfullscreen></iframe>
-      </div>
-
-      <canvas id="unity-canvas" width="450" height="800" tabindex="-1"></canvas>
+      <canvas id="unity-canvas" width=450 height=800 tabindex="-1"></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
           <div id="unity-progress-bar-full"></div>
         </div>
       </div>
-      <div id="unity-warning"></div>
+      <div id="unity-warning"> </div>
       <div id="unity-footer">
         <div id="unity-logo-title-footer"></div>
         <div id="unity-fullscreen-button"></div>
         <div id="unity-build-title">AI Dj</div>
       </div>
+    </div>
+
+    <!-- Suno iframe overlay -->
+    <div id="suno-iframe-wrapper">
+      <iframe 
+        src="https://suno.com/embed/a3f4da1e-0b9e-4655-b46b-b74773825e5b" 
+        width="760" 
+        height="240" 
+        style="border: none;">
+      </iframe>
     </div>
 
     <script>
@@ -45,7 +62,7 @@
         if (type == 'error') div.style = 'background: red; padding: 10px;';
         else {
           if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
-          setTimeout(function () {
+          setTimeout(function() {
             warningBanner.removeChild(div);
             updateBannerVisibility();
           }, 5000);
