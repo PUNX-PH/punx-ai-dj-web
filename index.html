@@ -6,26 +6,38 @@
     <title>Unity Web Player | AI Dj</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
+
     <style>
-      /* Wrapper makes Unity canvas the relative anchor */
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: white;
+      }
+
       #unity-container {
         position: relative;
         width: 100%;
         max-width: 450px;
-        margin: 0 auto;
+        height: 800px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
 
       #unity-canvas {
         width: 100%;
-        height: auto;
+        height: 100%;
       }
 
-      /* iFrame wrapper centered inside the canvas */
       #suno-iframe-wrapper {
         position: absolute;
-        top: 10px; /* Distance from top inside canvas */
+        top: 50%;
         left: 50%;
-        transform: translateX(-50%);
+        transform: translate(-50%, -50%);
         z-index: 9999;
         width: 90%;
         max-width: 760px;
@@ -40,17 +52,14 @@
       }
     </style>
   </head>
+
   <body>
-    <!-- Unity WebGL Container -->
     <div id="unity-container" class="unity-desktop">
       <canvas id="unity-canvas" width="450" height="800" tabindex="-1"></canvas>
 
-      <!-- Suno iframe overlay inside the Unity canvas -->
+      <!-- Suno iframe wrapper -->
       <div id="suno-iframe-wrapper">
-        <iframe 
-          src="https://suno.com/embed/a3f4da1e-0b9e-4655-b46b-b74773825e5b" 
-          allow="autoplay">
-        </iframe>
+        <iframe src="https://suno.com/embed/a3f4da1e-0b9e-4655-b46b-b74773825e5b" allowfullscreen></iframe>
       </div>
 
       <div id="unity-loading-bar">
@@ -110,6 +119,9 @@
         document.getElementsByTagName('head')[0].appendChild(meta);
         document.querySelector("#unity-container").className = "unity-mobile";
         canvas.className = "unity-mobile";
+      } else {
+        canvas.style.width = "450px";
+        canvas.style.height = "800px";
       }
 
       document.querySelector("#unity-loading-bar").style.display = "block";
