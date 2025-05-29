@@ -1,65 +1,67 @@
 <!DOCTYPE html>
 <html lang="en-us">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Unity Web Player | AI Dj</title>
-    <link rel="shortcut icon" href="TemplateData/favicon.ico">
-    <link rel="stylesheet" href="TemplateData/style.css">
-
+    <link rel="shortcut icon" href="TemplateData/favicon.ico" />
+    <link rel="stylesheet" href="TemplateData/style.css" />
     <style>
-      html, body {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: white;
-      }
-
-      #unity-container {
-        position: relative;
-        width: 100%;
-        max-width: 450px;
+      /* Overlay container for iframe + input UI */
+      #suno-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 450px;
         height: 800px;
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
-      }
-
-      #unity-canvas {
-        width: 100%;
-        height: 100%;
+        pointer-events: none;
       }
 
       #suno-iframe-wrapper {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 9999;
         width: 90%;
-        max-width: 760px;
         aspect-ratio: 760 / 240;
         pointer-events: auto;
       }
 
-      #suno-iframe-wrapper iframe {
-        width: 100%;
-        height: 100%;
-        border: none;
+      #suno-controls {
+        margin-top: 12px;
+        display: flex;
+        gap: 8px;
+        pointer-events: auto;
+      }
+
+      #suno-controls input {
+        padding: 6px;
+        width: 220px;
+      }
+
+      #suno-controls button {
+        padding: 6px 10px;
+        cursor: pointer;
       }
     </style>
   </head>
-
   <body>
-    <div id="unity-container" class="unity-desktop">
+    <div id="unity-container" class="unity-desktop" style="position: relative;">
       <canvas id="unity-canvas" width="450" height="800" tabindex="-1"></canvas>
 
-      <!-- Suno iframe wrapper -->
-      <div id="suno-iframe-wrapper">
-        <iframe src="https://suno.com/embed/a3f4da1e-0b9e-4655-b46b-b74773825e5b" allowfullscreen></iframe>
+      <div id="suno-overlay">
+        <div id="suno-iframe-wrapper">
+          <iframe
+            id="suno-iframe"
+            src="https://suno.com/embed/a3f4da1e-0b9e-4655-b46b-b74773825e5b"
+            style="width: 100%; height: 100%; border: none;"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <div id="suno-controls">
+          <input type="text" id="sunoIdInput" placeholder="Enter Suno ID" />
+          <button onclick="updateSunoIframe()">Update Suno ID</button>
+        </div>
       </div>
 
       <div id="unity-loading-bar">
@@ -68,7 +70,7 @@
           <div id="unity-progress-bar-full"></div>
         </div>
       </div>
-      <div id="unity-warning"> </div>
+      <div id="unity-warning"></div>
       <div id="unity-footer">
         <div id="unity-logo-title-footer"></div>
         <div id="unity-fullscreen-button"></div>
@@ -77,20 +79,18 @@
     </div>
 
     <script>
-      var canvas = document.querySelector("#unity-canvas");
-
       function unityShowBanner(msg, type) {
         var warningBanner = document.querySelector("#unity-warning");
         function updateBannerVisibility() {
-          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+          warningBanner.style.display = warningBanner.children.length ? "block" : "none";
         }
-        var div = document.createElement('div');
+        var div = document.createElement("div");
         div.innerHTML = msg;
         warningBanner.appendChild(div);
-        if (type == 'error') div.style = 'background: red; padding: 10px;';
+        if (type == "error") div.style = "background: red; padding: 10px;";
         else {
-          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
-          setTimeout(function() {
+          if (type == "warning") div.style = "background: yellow; padding: 10px;";
+          setTimeout(function () {
             warningBanner.removeChild(div);
             updateBannerVisibility();
           }, 5000);
@@ -98,10 +98,31 @@
         updateBannerVisibility();
       }
 
+      function updateSunoIframe() {
+        const sunoId = document.getElementById("sunoIdInput").value.trim();
+        const wrapper = document.getElementById("suno-iframe-wrapper");
+
+        if (sunoId) {
+          // Remove old iframe
+          wrapper.innerHTML = "";
+
+          // Create new iframe with updated src
+          const iframe = document.createElement("iframe");
+          iframe.id = "suno-iframe";
+          iframe.src = `https://suno.com/embed/${sunoId}`;
+          iframe.allowFullscreen = true;
+          iframe.style.width = "100%";
+          iframe.style.height = "100%";
+          iframe.style.border = "none";
+
+          wrapper.appendChild(iframe);
+        }
+      }
+
+      var canvas = document.querySelector("#unity-canvas");
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/punx-ai-dj-web.loader.js";
       var config = {
-        arguments: [],
         dataUrl: buildUrl + "/punx-ai-dj-web.data",
         frameworkUrl: buildUrl + "/punx-ai-dj-web.framework.js",
         codeUrl: buildUrl + "/punx-ai-dj-web.wasm",
@@ -113,10 +134,11 @@
       };
 
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        var meta = document.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-        document.getElementsByTagName('head')[0].appendChild(meta);
+        var meta = document.createElement("meta");
+        meta.name = "viewport";
+        meta.content =
+          "width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes";
+        document.getElementsByTagName("head")[0].appendChild(meta);
         document.querySelector("#unity-container").className = "unity-mobile";
         canvas.className = "unity-mobile";
       } else {
@@ -131,16 +153,17 @@
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
           document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
-        }).then((unityInstance) => {
-          document.querySelector("#unity-loading-bar").style.display = "none";
-          document.querySelector("#unity-fullscreen-button").onclick = () => {
-            unityInstance.SetFullscreen(1);
-          };
-        }).catch((message) => {
-          alert(message);
-        });
+        })
+          .then((unityInstance) => {
+            document.querySelector("#unity-loading-bar").style.display = "none";
+            document.querySelector("#unity-fullscreen-button").onclick = () => {
+              unityInstance.SetFullscreen(1);
+            };
+          })
+          .catch((message) => {
+            alert(message);
+          });
       };
-
       document.body.appendChild(script);
     </script>
   </body>
