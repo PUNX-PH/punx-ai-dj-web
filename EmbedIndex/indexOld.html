@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Unity WebGL with Suno Embed</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #unity-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: #000;
+    }
+
+    #unity-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    #suno-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    #suno-iframe-wrapper {
+      width: 400px;
+      aspect-ratio: 760 / 240;
+      pointer-events: auto;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      margin-bottom: 10px;
+    }
+
+    #suno-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    #suno-controls {
+      display: flex;
+      gap: 10px;
+      pointer-events: auto;
+    }
+
+    #suno-input {
+      padding: 5px;
+      width: 300px;
+    }
+
+    #suno-button {
+      padding: 6px 12px;
+    }
+  </style>
+</head>
+<body>
+  <div id="unity-container">
+    <canvas id="unity-canvas"></canvas>
+
+    <!-- Suno Overlay -->
+    <div id="suno-overlay">
+      <div id="suno-iframe-wrapper">
+        <iframe
+          id="suno-iframe"
+          src="https://suno.com/embed/75748c9d-21b3-4001-b51c-7315f143"
+          allow="autoplay"
+        ></iframe>
+      </div>
+      <div id="suno-controls">
+        <input type="text" id="suno-input" placeholder="Enter Suno ID" />
+        <button id="suno-button">Update Suno ID</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("suno-button").addEventListener("click", () => {
+      const sunoId = document.getElementById("suno-input").value.trim();
+      if (sunoId) {
+        const iframe = document.getElementById("suno-iframe");
+        iframe.src = `https://suno.com/embed/${sunoId}`;
+      }
+    });
+  </script>
+</body>
+</html>
