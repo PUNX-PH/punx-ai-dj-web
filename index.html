@@ -1,86 +1,13 @@
 <!DOCTYPE html>
 <html lang="en-us">
   <head>
-    <meta charset="utf-8" />
-    <title>AI Dj</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <link rel="shortcut icon" href="favicon.ico" />
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity Web Player | AI Dj</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+
     <style>
-      html, body {
-        margin: 0;
-        padding: 0;
-        background: #000;
-        height: 100%;
-        overflow: hidden;
-      }
-
-      #unity-container {
-        width: 100%;
-        height: 100%;
-        position: relative;
-        background: #231F20;
-      }
-
-      #unity-canvas {
-        width: 100%;
-        height: 100%;
-        background: #000;
-      }
-
-      #unity-loading-bar {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 80%;
-        max-width: 400px;
-        z-index: 10;
-      }
-
-      #unity-progress-bar-empty,
-      #unity-progress-bar-full {
-        height: 20px;
-        border-radius: 10px;
-      }
-
-      #unity-progress-bar-empty {
-        background: #888;
-      }
-
-      #unity-progress-bar-full {
-        width: 0%;
-        background: #4AF;
-      }
-
-      #unity-warning {
-        position: absolute;
-        bottom: 10px;
-        left: 10px;
-        color: white;
-        z-index: 100;
-      }
-
-      #unity-footer {
-        position: absolute;
-        bottom: 10px;
-        width: 100%;
-        text-align: center;
-        color: white;
-        font-family: Arial, sans-serif;
-        z-index: 5;
-      }
-
-      #unity-fullscreen-button {
-        cursor: pointer;
-        background: #4AF;
-        color: white;
-        padding: 5px 10px;
-        border-radius: 5px;
-        display: inline-block;
-        margin-top: 5px;
-      }
-
-      /* Suno Music Overlay */
       #suno-iframe-wrapper {
         position: absolute;
         top: 0;
@@ -109,51 +36,58 @@
     </style>
   </head>
   <body>
-    <div id="unity-container">
-      <canvas id="unity-canvas" tabindex="-1"></canvas>
-
+    <div id="unity-container" class="unity-desktop">
+      <canvas id="unity-canvas" width="450" height="800" tabindex="-1"></canvas>
       <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
           <div id="unity-progress-bar-full"></div>
         </div>
       </div>
-
       <div id="unity-warning"></div>
-
       <div id="unity-footer">
+        <div id="unity-logo-title-footer"></div>
+        <div id="unity-fullscreen-button"></div>
         <div id="unity-build-title">AI Dj</div>
-        <div id="unity-fullscreen-button">Fullscreen</div>
       </div>
+    </div>
 
-      <!-- Suno Music Iframe Overlay -->
-      <div id="suno-iframe-wrapper">
-        <div id="suno-iframe-container">
-          <iframe
-            src="https://suno.com/embed/e4ba242c-4efd-4a95-aeec-840e2d0f3410"
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen"
-            sandbox="allow-same-origin allow-scripts allow-popups allow-forms">
-          </iframe>
-        </div>
+    <!-- 🎵 Suno Iframe Overlay -->
+    <div id="suno-iframe-wrapper">
+      <div id="suno-iframe-container">
+        <iframe src="https://suno.com/embed/e4ba242c-4efd-4a95-aeec-840e2d0f3410"
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen"
+          sandbox="allow-same-origin allow-scripts allow-popups allow-forms">
+        </iframe>
       </div>
     </div>
 
     <script>
+      var canvas = document.querySelector("#unity-canvas");
+
       function unityShowBanner(msg, type) {
-        const warningBanner = document.getElementById("unity-warning");
-        const div = document.createElement("div");
-        div.innerHTML = msg;
-        div.style.padding = "10px";
-        div.style.background = type === "error" ? "red" : "yellow";
-        warningBanner.appendChild(div);
-        if (type === "warning") {
-          setTimeout(() => warningBanner.removeChild(div), 5000);
+        var warningBanner = document.querySelector("#unity-warning");
+        function updateBannerVisibility() {
+          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
         }
+        var div = document.createElement('div');
+        div.innerHTML = msg;
+        warningBanner.appendChild(div);
+        if (type == 'error') div.style = 'background: red; padding: 10px;';
+        else {
+          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+          setTimeout(function () {
+            warningBanner.removeChild(div);
+            updateBannerVisibility();
+          }, 5000);
+        }
+        updateBannerVisibility();
       }
 
-      const buildUrl = "Build";
-      const loaderUrl = buildUrl + "/punx-ai-dj-web.loader.js";
-
-      const config = {
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/punx-ai-dj-web.loader.js";
+      var config = {
+        arguments: [],
         dataUrl: buildUrl + "/punx-ai-dj-web.data",
         frameworkUrl: buildUrl + "/punx-ai-dj-web.framework.js",
         codeUrl: buildUrl + "/punx-ai-dj-web.wasm",
@@ -164,14 +98,29 @@
         showBanner: unityShowBanner,
       };
 
-      const script = document.createElement("script");
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+        document.querySelector("#unity-container").className = "unity-mobile";
+        canvas.className = "unity-mobile";
+        // config.devicePixelRatio = 1;
+      } else {
+        canvas.style.width = "450px";
+        canvas.style.height = "800px";
+      }
+
+      document.querySelector("#unity-loading-bar").style.display = "block";
+
+      var script = document.createElement("script");
       script.src = loaderUrl;
       script.onload = () => {
-        createUnityInstance(document.querySelector("#unity-canvas"), config, (progress) => {
+        createUnityInstance(canvas, config, (progress) => {
           document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
         }).then((unityInstance) => {
-          document.getElementById("unity-loading-bar").style.display = "none";
-          document.getElementById("unity-fullscreen-button").onclick = () => {
+          document.querySelector("#unity-loading-bar").style.display = "none";
+          document.querySelector("#unity-fullscreen-button").onclick = () => {
             unityInstance.SetFullscreen(1);
           };
         }).catch((message) => {
@@ -180,10 +129,11 @@
       };
       document.body.appendChild(script);
 
-      // Position iframe overlay
+      // 🧩 Position iframe wrapper over canvas
       function positionIframeOverCanvas() {
         const canvas = document.getElementById("unity-canvas");
         const wrapper = document.getElementById("suno-iframe-wrapper");
+
         const rect = canvas.getBoundingClientRect();
         wrapper.style.width = rect.width + "px";
         wrapper.style.height = rect.height + "px";
@@ -193,6 +143,7 @@
 
       window.addEventListener("resize", positionIframeOverCanvas);
       window.addEventListener("load", positionIframeOverCanvas);
+      positionIframeOverCanvas();
     </script>
   </body>
 </html>
